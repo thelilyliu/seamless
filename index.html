@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1>SeamlessMD</h1>
+            <p>Name of patient: <span class="patient"></span></p>
+            <p>Organization name: <span class="organization"></span></p>
+            <p>Gender: <span class="gender"></span></p>
+            <p>Number of conditions they have: <span class="number"></span></p>
+            <p>List of all conditions:</p> 
+            <ul class="conditions"></ul>
+        </div>
+
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+                getData()
+            })
+
+            function getData() {
+                $.ajax({
+                    type: 'GET',
+                    url: '/getData',
+                    dataType: 'json',
+                    cache: false
+                }).done(function(json, textStatus, jqXHr) {
+                    var data = jQuery.parseJSON(json)
+                    console.log(data)
+
+                    $('.patient').text(data.name[0].given + ' ' + data.name[0].family)
+                    $('.organization').text(data.managingOrganization.display)
+                    $('.gender').text(data.gender)
+                    $('.number').text(data.conditions.length)
+
+                    var $list = $('.conditions')
+                    var arr = data.conditions
+
+                    for (var i = 0; i < arr.length; i++) {
+                        var item = '<li>' + arr[i] + '</li>'
+                        $list.append(item)
+                    }
+
+                    /*
+                    Name of patient: Jane Doe
+                    Organization name: College Hospital
+                    Gender: Female
+                    Number of conditions they have: 2
+                    List of all conditions:
+                    - Epilepsy
+                    - Sleep apnea
+                    */
+                }).fail(function(jqXHr, textStatus, errorThrown) {
+                    console.log('fail')
+                }).always(function() {})
+            }
+        </script>
+    </body>
+</html>
